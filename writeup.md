@@ -14,8 +14,8 @@ The model for generating trajectories can be mainly divided into the following c
 * Trajectory Generator ([TrajectoryGenerator.h](src/state/TrajectoryGenerator.h))
 
 #### State Machine
-The state machine is core component of the trajectory generation model.
-Similar to the classes, the following states and their transitions are implemented:
+The state machine is the core component of the trajectory generation model.
+Similar to the lessons, the following states and their transitions are implemented:
 
 ![alt text](images/state-machine.jpg "State Machine")
 
@@ -47,8 +47,8 @@ Each instance of `State` has a method
 Trajectory Next_Trajectory(const std::unique_ptr<Trajectory> &prev_traj) const;
 ``` 
 implemented by the base class `State`. Most of the common trajectory generation code resides there. It internally uses
-the polymorphic `void Add_Spline_Points(...)` function to account for the state specific behaviour. One of most 
-challenging parts was the velocity control of the vehicle. It is implemented in `Trajectory State::Break_Up_Spline_Points(...)`
+the polymorphic `void Add_Spline_Points(...)` function to account for the state specific behaviour. One of the most 
+challenging part was the velocity control of the vehicle. It is implemented in `Trajectory State::Break_Up_Spline_Points(...)`
 in `State.cpp` in the first section of this function. It computes a maximum acceleration based on previous measurements 
 to reduce acceleration limit exceedance in the simulation. By doing so, a good but yet improvable acceleration
 behaviour can be observed. 
