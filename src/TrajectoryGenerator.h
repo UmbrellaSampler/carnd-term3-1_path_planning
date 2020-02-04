@@ -6,58 +6,37 @@
 #define PATH_PLANNING_TRAJECTORYGENERATOR_H
 
 #include <vector>
+#include <list>
+#include "Vehicle.h"
+#include "state/State.h"
+#include "Types.h"
 
-struct Trajectory
-{
-    std::vector<double> path_x;
-    std::vector<double> path_y;
-};
-
-struct State
-{
-    double x;
-    double y;
-    double s;
-    double d;
-    double yaw;
-    double speed;
-};
-
-struct MapWaypoints {
-    std::vector<double> x;
-    std::vector<double> y;
-    std::vector<double> s;
-    std::vector<double> dx;
-    std::vector<double> dy;
-};
 
 class TrajectoryGenerator
 {
 public:
-    explicit TrajectoryGenerator(MapWaypoints map_waypoints);
+    explicit TrajectoryGenerator(std::shared_ptr<const MapWaypoints> map_waypoints);
 
     /**
      * Computes the next trajectory the car should follow
-     *
-     * @param previous_traj the remaining trajectory the car has not yet followed during
-     *                      last iteration
-     * @param car_state the new state of the car
-     * @return the computed trajectory the car should follow
      */
-    Trajectory NextTrajectory(const Trajectory &previous_traj, const State &car_state);
+    Trajectory Next_Trajectory(std::unique_ptr<Trajectory>&& previous_traj,
+                               std::unique_ptr<Model>&& model);
 
 private:
 
     std::vector<double> getXY(double s, double d);
 
+
     /** Lane of the vehicle */
     int lane_ = 1;
 
     /** Waypoints of the map */
-    MapWaypoints map_waypoints_;
+    std::shared_ptr<const MapWaypoints> map_waypoints_;
 
-    /** Desired velocity of the car */
-    double ref_vel_ = 50.0;
+    /** State of the model */
+    std::unique_ptr<State> state_;
+
 };
 
 

@@ -8,6 +8,7 @@
 #include "helpers.h"
 #include "json.hpp"
 #include "TrajectoryGenerator.h"
+#include "Vehicle.h"
 
 // for convenience
 using nlohmann::json;
@@ -51,13 +52,13 @@ int main() {
         map_waypoints_dy.push_back(d_y);
     }
 
-    auto map_waypoints = MapWaypoints{
+    auto map_waypoints = std::make_shared<const MapWaypoints>(MapWaypoints{
         map_waypoints_x,
         map_waypoints_y,
         map_waypoints_s,
         map_waypoints_dx,
         map_waypoints_dy
-    };
+    });
     auto traj_gen = TrajectoryGenerator{map_waypoints};
 
     h.onMessage([&traj_gen]
@@ -104,11 +105,15 @@ int main() {
                      *   sequentially every .02 seconds
                      */
 
-                    Trajectory prev_traj{previous_path_x, previous_path_y};
+                    auto prev_traj = std::make_unique<Trajectory>(Trajectory{previous_path_x, previous_path_y});
 
-                    State car_state{car_x, car_y, car_s, car_d, car_yaw, car_speed};
+                    auto model = std::make_unique<Model>();
+                    model->ego_state = {car_x, car_y, car_s, car_d, car_yaw, car_speed};
+                    model->sensors.vehicles = To_Vehicles(sensor_fusion);
 
-                    auto next_traj = traj_gen.NextTrajectory(prev_traj, car_state);
+                    auto next_traj = traj_gen.Next_Trajectory(
+                            std::move(prev_traj),
+                            std::move(model));
 
 
                     msgJson["next_x"] = std::move(next_traj.path_x);
